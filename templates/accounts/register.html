@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block title %} Register {% endblock %}
+
+{% block content %}
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6 offset-md-3">
+                    <h2 class="text-center">Inscription</h2>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                          <label for="email" class="form-label">Email</label>
+                          <input type="email" class="form-control" name="email" id="email" placeholder="name@example.com">
+                        </div>
+                        <div class="mb-3">
+                          <label for="username" class="form-label">Pseudo</label>
+                          <input type="text" class="form-control" name="username" id="username" placeholder="Username">
+                        </div>
+                        <div class="mb-3">
+                          <label for="password" class="form-label">Mot de passe</label>
+                          <input type="password" class="form-control" name="password" id="password" placeholder="Password">
+                        </div>
+                        <button type="submit" class="btn btn-dark btn-lg">Enregistrer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
