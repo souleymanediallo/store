@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block title %} Book store : detail {% endblock %}
+
+{% block content %}
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <img src="{{ product.image_url }}" class="img-fluid" alt="{{ product.name }}">
+                </div>
+                <div class="col-md-9">
+                    <h1>{{ product.name }}</h1>
+                    <h4 class="my-3">Stock : {{ product.stock }} disponibles</h4>
+                    <h4 class="my-3">Prix : {{ product.price }} €</h4>
+
+                    <form action="#" method="post">
+                        {% csrf_token %}
+                        <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}">
+                        <button type="submit" class="btn btn-dark">Ajouter au panier</button>
+                    </form>
+                    <p class="py-3">{{ product.description }}</p>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+{% endblock %}
