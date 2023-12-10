@@ -17,6 +17,7 @@ class Product(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
     premium = models.BooleanField(default=False)
+    stripe_id = models.CharField(max_length=255, blank=True, null=True)
 
     def __str__(self):
         return f"{self.name}"

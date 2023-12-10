@@ -1,8 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
+
+from config import settings
 from .models import Product, Order, Cart
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
+import stripe
+stripe.api_key = settings.STRIPE_API_KEY
 
 # Create your views here.
 def home(request):
@@ -64,3 +68,19 @@ def cart_delete(request):
     cart.delete()
     return redirect('index')
 
+
+def create_checkout_session(request):
+    user = request.user
+    cart = get_object_or_404(Cart, user=user)
+    line_items = [{"price": order.product.stripe_id,
+                   "quantity": order.quantity} for order in cart.orders.all()]
+    session = stripe.checkout.Session.create(
+        locale='fr',
+        line_items=line_items,
+        payment_method_types=['card'],
+        mode='payment',
+        success_url='http://127.0.0.1:8000/',
+        cancel_url='http://127.0.0.1:8000/',
+    )
+
+    return redirect(session.url, code=303)

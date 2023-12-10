@@ -43,7 +43,14 @@
                 {% endif %}
             </div>
             <div class="col-lg-4">
-
+                <h2>Montant total</h2>
+                <hr>
+                <p>Nombre de produits : {{ orders.count }}</p>
+                <p>Montant total : {{ orders.total }}</p>
+                <hr>
+                <form action="{% url 'create-checkout-session' %}">
+                    <button type="submit" class="btn btn-success">Procéder au paiement</button>
+                </form>
             </div>
         </div>
     </div>
