@@ -15,7 +15,7 @@
                     <h4 class="my-3">Stock : {{ product.stock }} disponibles</h4>
                     <h4 class="my-3">Prix : {{ product.price }} €</h4>
 
-                    <form action="#" method="post">
+                    <form action="{% url 'add_to_cart' product.slug %}" method="post">
                         {% csrf_token %}
                         <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}">
                         <button type="submit" class="btn btn-dark">Ajouter au panier</button>

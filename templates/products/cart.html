@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %} Book store {% endblock %}
+
+{% block content %}
+
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-8">
+                {% if orders.count == 0 %}
+                <h2>Votre panier est vide</h2>
+                <a href="{% url 'product_list' %}" class="btn btn-dark">Retour à la liste des produits</a>
+                {% else %}
+                <h2>Liste des commandes </h2>
+                <h5>Nombre de commandes : {{ orders.count }}</h5>
+                <hr>
+                <p>Supprimer toutes les commandes :
+                    <a href="{% url 'cart_delete' %}" class="btn btn-danger">Supprimer</a>
+                </p>
+
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                        <th scope="col">Produit</th>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Prix</th>
+                        <th scope="col">Supprimer</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td><img src="{{ order.product.image_url }}" alt="{{ order.product.name }}" width="60" height="60"></td>
+                        <td>{{ order.product.name }}</td>
+                        <td>{{ order.product.price }}</td>
+                        <td>
+                            <a href="#" class="btn btn-danger">Supprimer</a>
+                        </td>
+                    </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div>
+            <div class="col-lg-4">
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
