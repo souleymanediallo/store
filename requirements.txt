@@ -4,6 +4,7 @@ charset-normalizer==3.3.2
 Django==5.0
 django-environ==0.11.2
 idna==3.6
+iso3166==2.1.1
 requests==2.31.0
 sqlparse==0.4.4
 stripe==7.8.1

@@ -121,3 +121,4 @@ MEDIA_ROOT = BASE_DIR / 'mediafiles'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STRIPE_API_KEY = env('STRIPE_API_KEY')
+WEBHOOK_API_KEY = env('WEBHOOK_API_KEY')

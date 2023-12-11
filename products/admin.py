@@ -4,21 +4,21 @@ from .models import Product, Order, Cart
 
 
 class ProductAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('name', 'slug', 'price', 'stock', 'created', 'active', 'premium')
 
 
 admin.site.register(Product, ProductAdmin)
 
 
 class OrderAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('user', 'product', 'quantity', 'ordered', 'created_at')
 
 
 admin.site.register(Order, OrderAdmin)
 
 
 class CartAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('user', 'get_total_quantity', 'get_total', 'created_at')
 
 
 admin.site.register(Cart, CartAdmin)

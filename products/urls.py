@@ -10,4 +10,6 @@ urlpatterns = [
     path('cart-delete/', views.cart_delete, name='cart_delete'),
     # stripe
     path('checkout/', views.create_checkout_session, name='create-checkout-session'),
+    path('success/', views.checkout_success, name='checkout-success'),
+    path('stripe-webhook/', views.stripe_webhook, name='stripe-webhook'),
 ]
