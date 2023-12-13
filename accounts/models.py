@@ -25,6 +25,7 @@ class MyUserManager(BaseUserManager):
 class MyUser(AbstractUser):
     username = None
     email = models.EmailField(max_length=255, unique=True)
+    stripe_id = models.CharField(max_length=255, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
@@ -49,6 +50,7 @@ class MyUser(AbstractUser):
 
 class ShippingAddress(models.Model):
     user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
     address_1 = models.CharField(max_length=255)
     address_2 = models.CharField(max_length=255, blank=True, null=True)
     city = models.CharField(max_length=255)

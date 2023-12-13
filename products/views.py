@@ -1,7 +1,9 @@
+from pprint import pprint
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 
-from accounts.models import MyUser
+from accounts.models import MyUser, ShippingAddress
 from config import settings
 from .models import Product, Order, Cart
 from django.urls import reverse
@@ -86,6 +88,8 @@ def create_checkout_session(request):
         line_items=line_items,
         payment_method_types=['card'],
         mode='payment',
+        customer_email=request.user.email,
+        shipping_address_collection={"allowed_countries": ["FR"]},
         success_url=request.build_absolute_uri(reverse('checkout-success')),
         cancel_url='http://127.0.0.1:8000/',
     )
@@ -113,29 +117,48 @@ def stripe_webhook(request):
         return HttpResponse(status=400)
 
     # Handle the event
-    if event.type == 'payment_intent.succeeded':
-        payment_intent = event.data.object  # contains a stripe.PaymentIntent
-        print('PaymentIntent was successful!')
-        completed_order(payment_intent)
-    elif event.type == 'payment_method.attached':
-        payment_method = event.data.object  # contains a stripe.PaymentMethod
-        print('PaymentMethod was attached to a Customer!')
-    # ... handle other event types
-    else:
-        print('Unhandled event type {}'.format(event.type))
+    if event['type'] == 'checkout.session.completed':
+        data = event['data']['object']  # contains a stripe.PaymentIntent PaymentIntent was successful!
+        pprint(data)
+        try:
+            user = get_object_or_404(MyUser, email=data["customer_details"]["email"])
+        except KeyError:
+            return HttpResponse("Invalid user email", status=400)
+
+        completed_order(data=data, user=user)
+        save_shipping_address(data=data, user=user)
+        return HttpResponse(status=200)
 
     return HttpResponse(status=200)
 
 
-def completed_order(data):
-    try:
-        user_email = data['customer_details']['email']
-    except KeyError:
-        return HttpResponse("Invalid user email", status=400)
-
-    user = get_object_or_404(MyUser, email=user_email)
-    user.cart.ordered = True
-    user.cart.created_at = timezone.now()
+def completed_order(data, user):
+    user.strip_id = data['customer']
+    user.cart.delete()
     user.cart.save()
     return HttpResponse(status=200)
+
+
+def save_shipping_address(data, user):
+    try:
+        address = data["shipping"]["address"]
+        name = address["name"]
+        city = address["city"]
+        line1 = address["line1"]
+        line2 = address["line2"]
+        zip_code = address["postal_code"]
+    except KeyError:
+        return HttpResponse("Invalid shipping address", status=400)
+
+    ShippingAddress.objects.get_or_create(
+        user=user,
+        name=name,
+        address_1=line1,
+        address_2=line2 or "",
+        city=city,
+        zip_code=zip_code,
+        country="fr"
+    )
+    return HttpResponse(status=200)
+
 
