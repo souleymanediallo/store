@@ -1,0 +1,50 @@
+{% extends 'layout.html' %}
+
+{% block title %} Connexion {% endblock %}
+
+{% block content %}
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group">
+                      <button type="button" class="list-group-item list-group-item-action active" aria-current="true">
+                        The current button
+                      </button>
+                      <button type="button" class="list-group-item list-group-item-action">A second button item</button>
+                      <button type="button" class="list-group-item list-group-item-action">A third button item</button>
+                      <button type="button" class="list-group-item list-group-item-action">A fourth button item</button>
+                      <button type="button" class="list-group-item list-group-item-action" disabled>A disabled button item</button>
+                    </div>
+                </div>
+                <div class="col-md-9">
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Modifier Mon Compte</h3>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                          <label for="username" class="form-label">Email</label>
+                          {{ form.email }}
+                        </div>
+                        <div class="mb-3">
+                          <label for="password" class="form-label">Nom</label>
+                          {{ form.first_name }}
+                        </div>
+                        <div class="mb-3">
+                          <label for="password" class="form-label">Prénom</label>
+                          {{ form.last_name }}
+                        </div>
+                        <button type="submit" class="btn btn-dark btn-lg">Enregistrer</button>
+                    </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+{% endblock %}

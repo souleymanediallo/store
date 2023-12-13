@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model, login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
+from .forms import ProfileForm
 
 from .models import MyUser
 User = get_user_model()
@@ -38,3 +39,17 @@ def logout_user(request):
 @login_required
 def profile(request):
     return render(request, 'accounts/profile.html')
+
+
+@login_required
+def profile_update(request):
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile')
+    else:
+        form = ProfileForm(instance=request.user)
+
+    context = {"form": form}
+    return render(request, 'accounts/profile-update.html', context)

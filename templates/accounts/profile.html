@@ -1,0 +1,43 @@
+{% extends 'layout.html' %}
+
+{% block title %} Connexion {% endblock %}
+
+{% block content %}
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="list-group">
+                      <button type="button" class="list-group-item list-group-item-action active" aria-current="true">
+                        The current button
+                      </button>
+                      <button type="button" class="list-group-item list-group-item-action">A second button item</button>
+                      <button type="button" class="list-group-item list-group-item-action">A third button item</button>
+                      <button type="button" class="list-group-item list-group-item-action">A fourth button item</button>
+                      <button type="button" class="list-group-item list-group-item-action" disabled>A disabled button item</button>
+                    </div>
+                </div>
+                <div class="col-md-9">
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Mon Compte</h3>
+                        </div>
+                        <div class="card-body">
+                            <h3>Informations personnelles</h3>
+                            <hr>
+                            <h4>Prénom : </h4>
+                            <p>{{ user.first_name }}</p>
+                            <h4>Nom : </h4>
+                            <p>{{ user.last_name }}</p>
+                            <h4>Email : </h4>
+                            <p>{{ user.email }}</p>
+                            <a href="{% url 'profile_update' %}" class="btn btn-dark btn-lg">Modifier Mon profile</a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+{% endblock %}
