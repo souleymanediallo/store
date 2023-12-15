@@ -12,7 +12,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import json
 
-
 import stripe
 stripe.api_key = settings.STRIPE_API_KEY
 
@@ -160,5 +159,7 @@ def save_shipping_address(data, user):
         country="fr"
     )
     return HttpResponse(status=200)
+
+
 
 
