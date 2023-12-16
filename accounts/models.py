@@ -1,8 +1,11 @@
+import stripe
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 # Create your models here.
 
 from iso3166 import countries
+
+from config import settings
 
 ADDRES_FORMAT = """
 {name}
@@ -10,6 +13,8 @@ ADDRES_FORMAT = """
 {city}, {zip_code}
 {country}
 """
+
+stripe.api_key = settings.STRIPE_API_KEY
 
 
 class MyUserManager(BaseUserManager):
@@ -60,7 +65,7 @@ class MyUser(AbstractUser):
 
 
 class ShippingAddress(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name="addresses")
+    user: MyUser = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name="addresses")
     name = models.CharField(max_length=255)
     address_1 = models.CharField(max_length=255)
     address_2 = models.CharField(max_length=255, blank=True, null=True)
@@ -73,6 +78,30 @@ class ShippingAddress(models.Model):
         data = self.__dict__.copy()
         data.update(country=self.get_country_display().upper())
         return ADDRES_FORMAT.format(**data).strip("\n")
+
+    def as_dict(self):
+        return {
+            "line1": self.address_1,
+            "line2": self.address_2,
+            "city": self.city,
+            "country": self.country,
+            "postal_code": self.zip_code,
+        }
+
+    def set_default(self):
+        if not self.user.stripe_id:
+            raise ValueError("Can't set default shipping address: no Stripe ID")
+
+        stripe.Customer.modify(
+            self.user.stripe_id,
+            shipping={
+                "name": self.name,
+                "address": self.as_dict()
+            },
+            address=self.as_dict()
+        )
+        self.default = True
+        self.save()
 
 
 
