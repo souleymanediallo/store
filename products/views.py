@@ -129,7 +129,6 @@ def stripe_webhook(request):
     # Handle the event
     if event['type'] == 'checkout.session.completed':
         data = event['data']['object']  # contains a stripe.PaymentIntent PaymentIntent was successful!
-        pprint(data)
         try:
             user = get_object_or_404(MyUser, email=data['customer_email'])
         except KeyError:
@@ -143,12 +142,16 @@ def stripe_webhook(request):
 
 
 def completed_order(data, user):
-    user.strip_id = data['customer']
-    user.save()
+    if user.stripe_id:
+        # Utiliser un client Stripe existant
+        data["customer"] = user.stripe_id
+    else:
+        # Créer un nouveau client Stripe pour la session
+        customer = stripe.Customer.create(email=user.email)
+        user.stripe_id = customer.id
+        user.save()
+        data["customer"] = customer.id
 
-    if hasattr(user, 'cart') and user.cart is not None:
-        user.cart.delete()
-        user.cart.save()
     return HttpResponse(status=200)
 
 
@@ -161,6 +164,13 @@ def save_shipping_address(data, user):
         line1 = address["line1"]
         line2 = address["line2"]
         zip_code = address["postal_code"]
+        print(data, "Voir l'id stripe")
+        # Extraire ID Stripe et le stocker dans user.stripe_id
+        stripe_id = data.get('customer')
+        if stripe_id:
+            user.stripe_id = stripe_id
+            user.save()
+
     except KeyError as e:
         print("KeyError in save_shipping_address:", e)
         return HttpResponse("Invalid shipping address", status=400)

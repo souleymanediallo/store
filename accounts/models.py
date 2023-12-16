@@ -50,6 +50,10 @@ class MyUser(AbstractUser):
     def has_module_perms(self, app_label):
         return True
 
+    def update_strip_id(self, new_stripe_id):
+        self.stripe_id = new_stripe_id
+        self.save()
+
     @property
     def is_staff(self):
         return self.is_admin
