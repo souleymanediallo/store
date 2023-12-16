@@ -77,25 +77,36 @@ def cart_delete(request):
     return redirect('index')
 
 
+@login_required
 def create_checkout_session(request):
-    user = request.user
-    cart = get_object_or_404(Cart, user=user)
-    line_items = [{"price": order.product.stripe_id,
-                   "quantity": order.quantity} for order in cart.orders.all()]
-    session = stripe.checkout.Session.create(
-        locale='fr',
-        line_items=line_items,
-        payment_method_types=['card'],
-        mode='payment',
-        customer_email=request.user.email,
-        shipping_address_collection={"allowed_countries": ["FR"]},
-        success_url=request.build_absolute_uri(reverse('checkout-success')),
-        cancel_url='http://127.0.0.1:8000/',
-    )
+    try:
+        user = request.user
+        cart = get_object_or_404(Cart, user=user)
+        line_items = [{"price": order.product.stripe_id, "quantity": order.quantity} for order in cart.orders.all()]
 
-    return redirect(session.url, code=303)
+        checkout_data = {
+            "payment_method_types": ['card'],
+            "line_items": line_items,
+            "mode": 'payment',
+            "locale": "fr",
+            "shipping_address_collection": {"allowed_countries": ["FR"]},
+            "success_url": request.build_absolute_uri(reverse('checkout-success')),
+            "cancel_url": request.build_absolute_uri(reverse('cart')),
+        }
+
+        if request.user.stripe_id:
+            checkout_data["customer"] = request.user.stripe_id
+        else:
+            checkout_data["customer_email"] = request.user.email
+
+        session = stripe.checkout.Session.create(**checkout_data)
+        return redirect(session.url)
+    except Exception as e:
+        print("Error in create_checkout_session:", e)
+        return HttpResponse("Erreur lors de la création de la session de paiement", status=400)
 
 
+@login_required
 def checkout_success(request):
     return render(request, 'products/success.html')
 
@@ -133,6 +144,7 @@ def stripe_webhook(request):
 
 def completed_order(data, user):
     user.strip_id = data['customer']
+    user.save()
 
     if hasattr(user, 'cart') and user.cart is not None:
         user.cart.delete()

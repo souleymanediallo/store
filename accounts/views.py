@@ -53,3 +53,10 @@ def profile_update(request):
 
     context = {"form": form}
     return render(request, 'accounts/profile-update.html', context)
+
+
+@login_required
+def address(request):
+    addresses = request.user.addresses.all()
+    context = {"addresses": addresses}
+    return render(request, 'accounts/address.html', context)

@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block title %} Connexion {% endblock %}
+
+{% block content %}
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    {% include 'partials/aside.html' %}
+                </div>
+                <div class="col-md-9">
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Adresse de Livraison </h3>
+                        </div>
+                        <div class="card-body">
+
+                            {% for address in addresses %}
+
+                                {% include 'partials/address.html' %}
+
+                            {% endfor %}
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+{% endblock %}

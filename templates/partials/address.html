@@ -1,0 +1,16 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <h4>{{ address.name }}</h4>
+        <p>{{ address.address_1 }}</p>
+        {% if address.address_2 %}
+        <p>{{ address.address_2 }}</p>
+        {% endif %}
+        <p> {{ address.zip_code }} {{ address.city }}</p>
+        <p>{{ address.get_country_display|upper }}</p>
+        <a href="#" class="btn btn-dark btn-lg">Modifier</a>
+        <a href="#" class="btn btn-danger btn-lg">Supprimer</a>
+    </div>
+</div>
+
+<!--#  <a href="address_update' address.id" class="btn btn-dark btn-lg">Modifier</a>-->
+<!--<a href="'address_delete' address.id" class="btn btn-danger btn-lg">Supprimer</a>-->

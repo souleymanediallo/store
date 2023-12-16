@@ -4,6 +4,13 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 
 from iso3166 import countries
 
+ADDRES_FORMAT = """
+{name}
+{address_1}
+{city}, {zip_code}
+{country}
+"""
+
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, password):
@@ -49,7 +56,7 @@ class MyUser(AbstractUser):
 
 
 class ShippingAddress(models.Model):
-    user = models.ForeignKey(MyUser, on_delete=models.CASCADE)
+    user = models.ForeignKey(MyUser, on_delete=models.CASCADE, related_name="addresses")
     name = models.CharField(max_length=255)
     address_1 = models.CharField(max_length=255)
     address_2 = models.CharField(max_length=255, blank=True, null=True)
@@ -59,7 +66,9 @@ class ShippingAddress(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.email} shipping address"
+        data = self.__dict__.copy()
+        data.update(country=self.get_country_display().upper())
+        return ADDRES_FORMAT.format(**data).strip("\n")
 
 
 
