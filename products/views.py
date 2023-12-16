@@ -120,36 +120,40 @@ def stripe_webhook(request):
         data = event['data']['object']  # contains a stripe.PaymentIntent PaymentIntent was successful!
         pprint(data)
         try:
-            user = get_object_or_404(MyUser, email=data["customer_details"]["email"])
+            user = get_object_or_404(MyUser, email=data['customer_email'])
         except KeyError:
             return HttpResponse("Invalid user email", status=400)
 
         completed_order(data=data, user=user)
         save_shipping_address(data=data, user=user)
-        return HttpResponse(status=200)
+        return HttpResponse("Adresse de livraison bien enregistrée !", status=200)
 
     return HttpResponse(status=200)
 
 
 def completed_order(data, user):
     user.strip_id = data['customer']
-    user.cart.delete()
-    user.cart.save()
+
+    if hasattr(user, 'cart') and user.cart is not None:
+        user.cart.delete()
+        user.cart.save()
     return HttpResponse(status=200)
 
 
 def save_shipping_address(data, user):
     try:
-        address = data["shipping"]["address"]
-        name = address["name"]
+        shipping_info = data["shipping"]
+        name = shipping_info["name"]
+        address = shipping_info["address"]
         city = address["city"]
         line1 = address["line1"]
         line2 = address["line2"]
         zip_code = address["postal_code"]
-    except KeyError:
+    except KeyError as e:
+        print("KeyError in save_shipping_address:", e)
         return HttpResponse("Invalid shipping address", status=400)
 
-    ShippingAddress.objects.get_or_create(
+    address, created = ShippingAddress.objects.get_or_create(
         user=user,
         name=name,
         address_1=line1,
@@ -158,6 +162,11 @@ def save_shipping_address(data, user):
         zip_code=zip_code,
         country="fr"
     )
+    if created:
+        print("New ShippingAddress created:", address)
+    else:
+        print("ShippingAddress already exists:", address)
+
     return HttpResponse(status=200)
 
 
