@@ -72,6 +72,7 @@ class ShippingAddress(models.Model):
     city = models.CharField(max_length=255)
     zip_code = models.CharField(max_length=255)
     country = models.CharField(max_length=2, choices=[(country.alpha2.lower(), country.name) for country in countries], default='fr')
+    default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -91,6 +92,10 @@ class ShippingAddress(models.Model):
     def set_default(self):
         if not self.user.stripe_id:
             raise ValueError("Can't set default shipping address: no Stripe ID")
+
+        self.user.addresses.update(default=False)
+        self.default = True
+        self.save()
 
         stripe.Customer.modify(
             self.user.stripe_id,

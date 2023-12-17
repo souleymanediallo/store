@@ -1,9 +1,8 @@
 from django.contrib.auth import get_user_model, login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .forms import ProfileForm
-
-from .models import MyUser
+from .models import MyUser, ShippingAddress
 User = get_user_model()
 
 
@@ -60,3 +59,10 @@ def address(request):
     addresses = request.user.addresses.all()
     context = {"addresses": addresses}
     return render(request, 'accounts/address.html', context)
+
+
+@login_required
+def set_default_shipping(request, pk):
+    address: ShippingAddress = get_object_or_404(ShippingAddress, pk=pk)
+    address.set_default()
+    return redirect('address')
