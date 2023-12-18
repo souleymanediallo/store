@@ -24,20 +24,25 @@
                         <th scope="col">Produit</th>
                         <th scope="col">Nom</th>
                         <th scope="col">Prix</th>
+                         <th scope="col">Quantité</th>
                         <th scope="col">Supprimer</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {% for order in orders %}
+                    <form method="POST" action="{% url 'update-quantity' %}">
+                    {% csrf_token %}
+                        {{ forms.management_form }}
+                        {% for form in forms %}
                     <tr>
-                        <td><img src="{{ order.product.image_url }}" alt="{{ order.product.name }}" width="60" height="60"></td>
-                        <td>{{ order.product.name }}</td>
-                        <td>{{ order.product.price }}</td>
-                        <td>
-                            <a href="#" class="btn btn-danger">Supprimer</a>
-                        </td>
+                        <td><img src="{{ form.instance.product.image_url }}" alt="{{ form.instance.product.name }}" width="60" height="60"></td>
+                        <td>{{ form.instance.product.name }}</td>
+                        <td>{{ form.instance.product.price }}</td>
+                        <td>{{ form.quantity }}</td>
+                        <td>{{ form.delete }} Supprimer</td>
                     </tr>
                         {% endfor %}
+                        <button type="submit" class="btn btn-success mb-2">Mettre à jour les quantités </button>
+                    </form>
                     </tbody>
                 </table>
                 {% endif %}

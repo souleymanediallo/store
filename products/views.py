@@ -1,5 +1,6 @@
 from pprint import pprint
 
+from django.forms import modelformset_factory
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 
@@ -11,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 import json
-
+from .forms import OrderForm
 import stripe
 stripe.api_key = settings.STRIPE_API_KEY
 
@@ -63,10 +64,24 @@ def add_to_cart(request, slug):
 def cart(request):
     user = request.user
     cart, _ = Cart.objects.get_or_create(user=user)
+    OrderFormSet = modelformset_factory(Order, form=OrderForm, extra=0)
+    formset = OrderFormSet(queryset=Order.objects.filter(user=user))
     context = {
-        'orders': cart.orders.all()
+        'orders': cart.orders.all(),
+        'forms': formset,
     }
     return render(request, 'products/cart.html', context)
+
+
+@login_required
+def update_quantity(request):
+    OrderFormSet = modelformset_factory(Order, form=OrderForm, extra=0)
+    formset = OrderFormSet(request.POST, queryset=Order.objects.filter(user=request.user))
+
+    if formset.is_valid():
+        formset.save()
+
+    return redirect('cart')
 
 
 @login_required
