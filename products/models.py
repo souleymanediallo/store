@@ -2,6 +2,7 @@ from django.db import models
 from django.db.models.fields import SlugField
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.text import slugify
 
 from config.settings import AUTH_USER_MODEL
 
@@ -9,7 +10,7 @@ from config.settings import AUTH_USER_MODEL
 # Create your models here.
 class Product(models.Model):
     name = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255)
+    slug = models.SlugField(max_length=255, blank=True, null=True)
     price = models.FloatField()
     stock = models.IntegerField()
     image_url = models.CharField(max_length=2083, blank=True, null=True)
@@ -24,6 +25,11 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse("product_detail", args=[self.slug])
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        return super().save(*args, **kwargs)
 
 
 class Order(models.Model):

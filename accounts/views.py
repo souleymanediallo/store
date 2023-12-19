@@ -66,3 +66,10 @@ def set_default_shipping(request, pk):
     address: ShippingAddress = get_object_or_404(ShippingAddress, pk=pk)
     address.set_default()
     return redirect('address')
+
+
+@login_required
+def address_delete(request, pk):
+    address: ShippingAddress = get_object_or_404(ShippingAddress, pk=pk, user=request.user)
+    address.delete()
+    return redirect('address')

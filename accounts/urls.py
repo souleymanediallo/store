@@ -10,4 +10,5 @@ urlpatterns = [
     path('profile/update/', views.profile_update, name='profile_update'),
     path('address/', views.address, name='address'),
     path('address/set-default-shipping/<int:pk>/', views.set_default_shipping, name='set-default-shipping'),
+    path('address/delete/<int:pk>/', views.address_delete, name='address-delete'),
 ]

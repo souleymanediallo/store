@@ -62,12 +62,12 @@ def add_to_cart(request, slug):
 
 @login_required
 def cart(request):
-    user = request.user
-    cart, _ = Cart.objects.get_or_create(user=user)
+    orders = Order.objects.filter(user=request.user)
+    if orders.count() == 0:
+        return redirect('index')
     OrderFormSet = modelformset_factory(Order, form=OrderForm, extra=0)
-    formset = OrderFormSet(queryset=Order.objects.filter(user=user))
+    formset = OrderFormSet(queryset=Order.objects.filter(user=request.user))
     context = {
-        'orders': cart.orders.all(),
         'forms': formset,
     }
     return render(request, 'products/cart.html', context)
